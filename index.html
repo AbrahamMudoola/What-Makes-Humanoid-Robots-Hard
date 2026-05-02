@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Makes Humanoid Robots Hard? — Abraham Mudoola</title>
+
+  <!-- SEO -->
+  <meta name="description" content="An interactive field guide to the 8 technical challenges standing between humanoid robots and the real world. Synthesized from McKinsey, Bain, BCG, Goldman Sachs, and 2024–2026 industrial pilots at BMW, Amazon, and Mercedes." />
+  <meta name="author" content="Abraham Mudoola" />
+  <meta name="keywords" content="humanoid robots, robotics, AI, Boston Dynamics, Figure AI, Agility Robotics, manufacturing, warehousing" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="What Makes Humanoid Robots Hard?" />
+  <meta property="og:description" content="An interactive field guide to the 8 technical challenges standing between humanoid robots and the real world. By Abraham Mudoola." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://abrahammudoola.github.io/humanoid-robots-hard" />
+  <meta property="og:image" content="https://abrahammudoola.github.io/humanoid-robots-hard/og-image.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@abrahammudola" />
+  <meta name="twitter:creator" content="@abrahammudola" />
+  <meta name="twitter:title" content="What Makes Humanoid Robots Hard?" />
+  <meta name="twitter:description" content="An interactive field guide to the 8 technical challenges standing between humanoid robots and the real world." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,300;9..144,0,400;9..144,0,600;9..144,1,300;9..144,1,400&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+
+  <!-- React via CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #f5c976;
+      --gold-dim: #a89868;
+      --gold-faint: rgba(245, 201, 118, 0.12);
+      --bg: #080814;
+      --bg-card: rgba(18, 16, 36, 0.7);
+      --text: #e8e4dc;
+      --text-muted: #a8a39a;
+      --text-dim: #7a7460;
+      --border: rgba(245, 201, 118, 0.12);
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button {
+      font-family: var(--font-body);
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+      text-align: left;
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    a:hover { color: var(--gold); }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(245, 201, 118, 0.2); border-radius: 3px; }
+
+    /* ── Animations ── */
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.1; }
+      50% { opacity: 0.8; }
+    }
+    @keyframes nebula-drift-1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(60px, -40px) scale(1.12); }
+    }
+    @keyframes nebula-drift-2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-70px, 50px) scale(1.18); }
+    }
+    @keyframes nebula-drift-3 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, 60px) scale(1.08); }
+    }
+    @keyframes icosa-spin {
+      from { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+      to   { transform: rotateX(360deg) rotateY(720deg) rotateZ(180deg); }
+    }
+    @keyframes cell-in {
+      from { opacity: 0; transform: scale(0.55); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slide-in-left {
+      from { opacity: 0; transform: translateX(-10px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes modal-in {
+      from { opacity: 0; transform: scale(0.93) translateY(12px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes pip-in {
+      from { opacity: 0; transform: scaleY(0); }
+      to   { opacity: 1; transform: scaleY(1); }
+    }
+    @keyframes nav-glow {
+      0%, 100% { box-shadow: 0 0 12px rgba(245, 201, 118, 0.15); }
+      50% { box-shadow: 0 0 24px rgba(245, 201, 118, 0.35); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ── Nav ── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(8, 8, 20, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 18px;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-logo span {
+      color: var(--gold);
+      font-style: italic;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+      color: var(--text-dim);
+    }
+    .nav-link:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 16px rgba(245, 201, 118, 0.2);
+    }
+    .nav-link svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 40px 80px;
+      position: relative;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    .hero-kicker {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 20px;
+      animation: fade-up 0.8s ease-out both;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 6vw, 80px);
+      font-weight: 400;
+      line-height: 1.02;
+      letter-spacing: -0.025em;
+      margin-bottom: 28px;
+      max-width: 900px;
+      background: linear-gradient(135deg, #f5e8c4 0%, #f5c976 55%, #d4956b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fade-up 0.8s ease-out 0.1s both;
+    }
+    .hero-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 640px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+      animation: fade-up 0.8s ease-out 0.2s both;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      animation: fade-up 0.8s ease-out 0.3s both;
+    }
+    .cta-primary {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, rgba(245, 201, 118, 0.15), rgba(245, 201, 118, 0.08));
+      border: 1px solid rgba(245, 201, 118, 0.5);
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: all 0.25s;
+      box-shadow: 0 0 24px rgba(245, 201, 118, 0.12);
+    }
+    .cta-primary:hover {
+      background: linear-gradient(135deg, rgba(245, 201, 118, 0.25), rgba(245, 201, 118, 0.12));
+      box-shadow: 0 0 40px rgba(245, 201, 118, 0.3);
+      transform: translateY(-1px);
+    }
+    .cta-secondary {
+      padding: 14px 28px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: all 0.25s;
+    }
+    .cta-secondary:hover {
+      border-color: var(--text-muted);
+      color: var(--text);
+    }
+    .hero-stats {
+      display: flex;
+      gap: 48px;
+      margin-top: 64px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+      animation: fade-up 0.8s ease-out 0.4s both;
+    }
+    .stat { display: flex; flex-direction: column; gap: 6px; }
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 36px;
+      color: var(--gold);
+      font-style: italic;
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* ── Section wrapper ── */
+    .section {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+      position: relative;
+      z-index: 1;
+    }
+    .section-kicker {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+      text-shadow: 0 0 12px rgba(245, 201, 118, 0.35);
+    }
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(245, 201, 118, 0.2), transparent);
+      margin: 0 40px 80px;
+    }
+
+    /* ── Starfield canvas ── */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+    }
+    .nebula {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      pointer-events: none;
+    }
+
+    /* ── App container ── */
+    #app { position: relative; z-index: 1; }
+
+    /* ── Footer ── */
+    .site-footer {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 48px 40px 60px;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 40px;
+      align-items: end;
+    }
+    .footer-left {}
+    .footer-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+    .footer-sub {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      max-width: 560px;
+      margin-bottom: 24px;
+    }
+    .footer-socials {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .footer-social {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      transition: all 0.2s;
+    }
+    .footer-social:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(245, 201, 118, 0.05);
+    }
+    .footer-social svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+    .footer-right {
+      text-align: right;
+    }
+    .signature-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .signature-name {
+      font-family: var(--font-display);
+      font-size: 20px;
+      color: var(--gold);
+      font-style: italic;
+      letter-spacing: 0.01em;
+      text-shadow: 0 0 20px rgba(245, 201, 118, 0.3);
+    }
+    .footer-legal {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 16px 40px 32px;
+    }
+    .footer-legal p {
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      opacity: 0.7;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .nav { padding: 12px 20px; }
+      .hero { padding: 100px 20px 60px; }
+      .section { padding: 0 20px 60px; }
+      .section-divider { margin: 0 20px 60px; }
+      .hero-stats { gap: 28px; margin-top: 40px; }
+      .site-footer {
+        grid-template-columns: 1fr;
+        padding: 40px 20px 48px;
+      }
+      .footer-right { text-align: left; }
+      .footer-legal { padding: 0 20px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Starfield -->
+<div id="starfield">
+  <div class="nebula" style="top:-8%;left:-6%;width:700px;height:700px;background:radial-gradient(circle,rgba(110,80,200,0.18) 0%,transparent 70%);animation:nebula-drift-1 35s ease-in-out infinite;"></div>
+  <div class="nebula" style="bottom:-12%;right:-8%;width:800px;height:800px;background:radial-gradient(circle,rgba(210,120,70,0.14) 0%,transparent 70%);animation:nebula-drift-2 45s ease-in-out infinite;"></div>
+  <div class="nebula" style="top:40%;right:20%;width:500px;height:500px;background:radial-gradient(circle,rgba(80,140,200,0.09) 0%,transparent 70%);animation:nebula-drift-3 55s ease-in-out infinite;"></div>
+</div>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-logo">
+    <svg width="28" height="28" viewBox="0 0 100 100" fill="none" style="color:var(--gold);animation:icosa-spin 22s linear infinite;transform-origin:center center">
+      <g stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+        <polygon points="50,8 89,30 89,70 50,92 11,70 11,30"/>
+        <polygon points="50,8 89,30 50,50"/><polygon points="89,30 89,70 50,50"/>
+        <polygon points="89,70 50,92 50,50"/><polygon points="50,92 11,70 50,50"/>
+        <polygon points="11,70 11,30 50,50"/><polygon points="11,30 50,8 50,50"/>
+      </g>
+    </svg>
+    What Makes Humanoid Robots <span>Hard?</span>
+  </div>
+  <div class="nav-links">
+    <a href="https://x.com/abrahammudola?s=21" target="_blank" rel="noreferrer" class="nav-link" title="X / Twitter">
+      <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+    </a>
+    <a href="https://www.linkedin.com/in/abraham-mudoola" target="_blank" rel="noreferrer" class="nav-link" title="LinkedIn">
+      <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+    <a href="https://substack.com/@abrahammudola" target="_blank" rel="noreferrer" class="nav-link" title="Substack">
+      <svg viewBox="0 0 24 24"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/></svg>
+    </a>
+    <a href="https://youtube.com/@abrahammudola?si=LVjIg8jVEQbSoCsQ" target="_blank" rel="noreferrer" class="nav-link" title="YouTube">
+      <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+    </a>
+    <a href="https://github.com/AbrahamMudoola" target="_blank" rel="noreferrer" class="nav-link" title="GitHub">
+      <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-kicker">A field guide to physical intelligence · 2026</div>
+  <h1 class="hero-title">What Makes Humanoid Robots Hard?</h1>
+  <p class="hero-sub">
+    An interactive map of the 8 technical challenges standing between humanoid robots and widespread deployment — synthesized from major research reports and real pilots at BMW, Amazon, Mercedes, and more.
+  </p>
+  <div class="hero-cta">
+    <button class="cta-primary" onclick="document.getElementById('map-section').scrollIntoView({behavior:'smooth'})">
+      Explore the map ↓
+    </button>
+    <a href="https://substack.com/@abrahammudola" target="_blank" rel="noreferrer" class="cta-secondary">
+      Read the newsletter →
+    </a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">8</div>
+      <div class="stat-label">Core challenges</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Deployment contexts</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Solution angles</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">34</div>
+      <div class="stat-label">Approaches mapped</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- React app mounts here -->
+<div id="map-section">
+  <div id="app"></div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-left">
+    <div class="footer-title">Abraham Mudoola</div>
+    <p class="footer-sub">
+      Industrial Engineer with a robotics concentration from UMass Lowell. Writing about robotics, automation, and what it means for the people who build and work alongside these systems. This tool is open source — feel free to fork it.
+    </p>
+    <div class="footer-socials">
+      <a href="https://x.com/abrahammudola?s=21" target="_blank" rel="noreferrer" class="footer-social">
+        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X / Twitter
+      </a>
+      <a href="https://www.linkedin.com/in/abraham-mudoola" target="_blank" rel="noreferrer" class="footer-social">
+        <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://substack.com/@abrahammudola" target="_blank" rel="noreferrer" class="footer-social">
+        <svg viewBox="0 0 24 24"><path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/></svg>
+        Substack
+      </a>
+      <a href="https://youtube.com/@abrahammudola?si=LVjIg8jVEQbSoCsQ" target="_blank" rel="noreferrer" class="footer-social">
+        <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        YouTube
+      </a>
+      <a href="https://github.com/AbrahamMudoola" target="_blank" rel="noreferrer" class="footer-social">
+        <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+  <div class="footer-right">
+    <div class="signature-label">Designed &amp; created by</div>
+    <div class="signature-name">Abraham Mudoola</div>
+  </div>
+</footer>
+<div class="footer-legal">
+  <p>Sources: McKinsey, Bain, BCG, Goldman Sachs, Morgan Stanley, ARK Invest, Yole Group, IFR. Pilot data from BMW + Figure, GXO/Amazon + Agility, Mercedes + Apptronik, BYD/Geely/Foxconn + UBTECH, 1X NEO, Boston Dynamics. Open source — MIT License.</p>
+</div>
+
+<!-- Starfield generator -->
+<script>
+  const sf = document.getElementById('starfield');
+  for (let i = 0; i < 140; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 1.6 + 0.3;
+    s.style.cssText = `
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      width:${size}px;height:${size}px;
+      opacity:${Math.random()*0.5+0.1};
+      box-shadow:0 0 ${size*2}px rgba(255,255,255,0.4);
+      animation:twinkle ${Math.random()*7+4}s ease-in-out ${Math.random()*8}s infinite;
+    `;
+    sf.appendChild(s);
+  }
+</script>
+
+<!-- React app -->
+<script type="text/babel">
+const { useState, useMemo, useEffect, useRef } = React;
+
+// ── DATA ─────────────────────────────────────────────────────
+const BOTTLENECKS = [
+  {
+    id:'dexterity', num:'01', name:'Hands & Manipulation',
+    short:'Picking things up, holding tools, doing fiddly work',
+    definition:'Can the robot actually grab and use the messy variety of objects a human handles every day? This means soft things (laundry, food), squishy things, slippery things, fragile things, and tools designed for human hands. It also means using two hands together — like opening a jar.',
+    sota:"The most advanced robot hands today have around 20+ moving joints (Sanctuary AI's Phoenix has 21; Tesla's newest Optimus packs 25 motors per forearm; 1X's NEO uses tendons like a real hand with 22 joints). Figure's robots at BMW could place sheet metal parts within 5 millimeters — impressive, but only for that one specific task. Working with everyday tools, soft fabrics, cables, and small fasteners is still mostly unsolved.",
+    approaches:[
+      {angle:'design', name:'Build hands that look and work like human hands', players:'Sanctuary AI, Shadow Robot, Figure, 1X', bet:"If it works like a hand, it can do anything a hand does"},
+      {angle:'cost', name:'Build simpler grippers that are cheaper and tougher', players:'Tesla Optimus, many Chinese robot makers', bet:'Good enough for most jobs, way easier to manufacture'},
+      {angle:'data', name:'Teach robots by having humans demonstrate tasks', players:'Physical Intelligence, Tesla, AgiBot, 1X', bet:'Show the robot enough examples and it figures it out'},
+      {angle:'operations', name:'Mix human remote-control with robot autonomy', players:'1X NEO, Apptronik, Sanctuary', bet:'Ship robots now with a human in the loop, get smarter over time'},
+    ],
+    subnodes:['How many joints the hand has','Touch sensors in the fingers',"Gripping things you can't see clearly",'Moving an object around within one hand','Coordinating two hands together','Recognizing what tools are for','Handling soft things like cloth','Not crushing fragile objects',"Hands that don't break easily"],
+    contexts:{
+      manufacturing:{intensity:4, note:"Simple, repeatable tasks (like picking up a fixed metal part) work. Anything involving cables, soft trim panels, or small fasteners doesn't. The robot wrists used in BMW's pilot were the part that broke most often."},
+      warehousing:{intensity:3, note:'Moving boxes and bins works fine with a basic gripper. The problem comes when warehouses need to grab thousands of different individual items (like a single shampoo bottle) — that needs much fancier hands.'},
+      healthcare:{intensity:5, note:'Helping a patient sit up, handing over medication, prepping a surgical tray — these need extreme gentleness, force awareness, and precision that no robot has yet.'},
+      home:{intensity:5, note:"The hardest case. Folding laundry, loading a dishwasher, helping an elderly person — all involve soft objects, awkward angles, and the need to never hurt anyone. The 1X NEO's pre-launch demos still rely heavily on humans operating it remotely."},
+      hazardous:{intensity:4, note:"For just looking around (inspection), Boston Dynamics' Spot robot dog works fine without hands. But taking apart a damaged nuclear plant, turning valves, or grabbing samples needs the dexterity that doesn't reliably exist yet."},
+    },
+    refs:[
+      {title:'McKinsey — Will robots actually become coworkers?', url:'https://www.mckinsey.com/industries/industrials-and-electronics/our-insights/will-embodied-ai-create-robotic-coworkers'},
+      {title:'Survey on teaching robots through demonstration', url:'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12757213/'},
+      {title:'Figure AI — What we learned at BMW', url:'https://www.figure.ai/news/production-at-bmw'},
+    ],
+  },
+  {
+    id:'perception', num:'02', name:'Seeing & Understanding',
+    short:"Making sense of what's going on around the robot",
+    definition:"Can the robot look at a messy, unpredictable scene and figure out what's in it? This means recognizing objects, understanding where they are in 3D space, knowing if something is moving, and combining what it sees with what it feels (like touch) to build a useful picture of the world.",
+    sota:"This is actually the area where robots have made the most progress — they're close to human-level at recognizing things and locating themselves in a space. Modern robots use the same kind of AI that powers ChatGPT (called 'vision-language models') combined with cameras and sensors. NVIDIA, Google, and many startups are pouring resources into this layer.",
+    approaches:[
+      {angle:'control', name:'Use AI models trained on huge amounts of internet data', players:'Google DeepMind, NVIDIA, Figure, OpenVLA (open source)', bet:'The same scaling that made ChatGPT smart will make robots smart'},
+      {angle:'control', name:'Combine traditional mapping software with newer AI', players:'Boston Dynamics, Agility Robotics', bet:'Tried-and-true methods stay reliable in factories'},
+      {angle:'design', name:'Add cameras to the hands themselves', players:'Figure 03 has cameras on the palms', bet:"Solves the problem of the robot's own hands blocking its view"},
+      {angle:'design', name:'Combine vision with sense of touch and force', players:'Several research groups', bet:"You can't see how hard you're squeezing — touch matters"},
+    ],
+    subnodes:['Recognizing objects it has never seen before','Knowing exactly where something is in 3D','Handling see-through, shiny, or squishy things',"Dealing with the robot's own body blocking its view",'Understanding scenes in real time','Mapping warehouses where things keep moving','Combining vision with touch and force sensors','Doing all this on a small computer inside the robot',"Protecting people's privacy"],
+    contexts:{
+      manufacturing:{intensity:3, note:'Factories are pretty controlled environments — same parts, fixed locations. The hard part is glare from welding sparks or shiny car paint that confuses cameras.'},
+      warehousing:{intensity:3, note:'The challenge is the sheer variety. A warehouse can have tens of thousands of different products. Lighting is at least controlled, which helps.'},
+      healthcare:{intensity:4, note:'Privacy matters enormously (medical records and patient images are protected). The robot also has to reliably distinguish a patient from equipment from medication — a serious mistake could hurt someone.'},
+      home:{intensity:5, note:"Houses are wildly different. Clutter, weird lighting, kids running around, pets — and the robot has cameras streaming inside your home, which raises real privacy concerns. Already a controversy around the 1X NEO."},
+      hazardous:{intensity:3, note:'In radiation zones, the radiation itself can mess with camera sensors. Dust kicked up in disaster sites obscures vision. Hardened cameras work but add weight.'},
+    },
+    refs:[
+      {title:"NVIDIA — Their robot AI platform explained", url:'https://developer.nvidia.com/blog/building-generalist-humanoid-capabilities-with-nvidia-isaac-gr00t-n1-6-using-a-sim-to-real-workflow/'},
+      {title:'Google DeepMind — Teaching robots to follow instructions', url:'https://deepmind.google/blog/rt-2-new-model-translates-vision-and-language-into-action/'},
+      {title:'OpenVLA — An open-source robot AI model', url:'https://arxiv.org/pdf/2406.09246'},
+    ],
+  },
+  {
+    id:'locomotion', num:'03', name:'Walking & Balance',
+    short:'Moving around without falling over',
+    definition:"Can the robot walk, run, climb stairs, handle bumps and shoves, and recover if it falls? And can it do all that while also carrying things or using its hands? Two-legged walking is much harder than rolling on wheels — but legs can go places wheels can't.",
+    sota:"Walking on flat floors is basically solved — every major humanoid robot can do it now. Stairs and uneven ground mostly work. The bigger problem is how much energy walking takes: a human uses very little energy per step compared to a robot, which is why robots have such short battery lives. That's also why some experts argue robots should just have wheels for now in factories and warehouses.",
+    approaches:[
+      {angle:'data', name:'Train robots to walk by trial and error in simulation', players:'NVIDIA, Figure, Unitree, EngineAI', bet:'Run millions of practice walks on a computer, then use that on the real robot'},
+      {angle:'control', name:'Use traditional engineering math to control walking', players:"Older systems like Honda's ASIMO and university research", bet:"You can mathematically prove it's safe"},
+      {angle:'design', name:'Skip the legs — use a four-legged "dog" with arms', players:"Boston Dynamics with their Spot robot", bet:"Most jobs don't need to look human"},
+      {angle:'design', name:'Use wheels instead of legs for indoor work', players:"Wheeled versions of Apptronik's Apollo and others", bet:'Wheels are faster, safer, and use less power on flat floors'},
+    ],
+    subnodes:['Staying upright on bumpy or moving ground','Planning where to step in a cluttered space','Recovering when shoved or slipping','Climbing stairs and ladders',"Falling safely so the robot doesn't break",'Getting up after falling','Walking while carrying heavy things','Practicing in simulation before the real world','Using less energy per step'],
+    contexts:{
+      manufacturing:{intensity:2, note:'Factory floors are mostly flat and clean. The edge cases are cables on the floor, oil spills, and stairs to control rooms.'},
+      warehousing:{intensity:2, note:'Warehouses are also mostly flat. The tricky bits are ramps to truck beds and reaching low shelves.'},
+      healthcare:{intensity:4, note:"Hospital corridors are flat but always crowded with carts, IV poles, and people. The absolute requirement: the robot can NEVER fall on a patient. That's a much higher bar than not falling on factory floors."},
+      home:{intensity:5, note:"Worst case. Stairs in every house, soft rugs, pets underfoot, kids' toys on the floor. The 1X NEO was specifically designed with a soft body to be safer when (not if) it falls."},
+      hazardous:{intensity:5, note:"Climbing ladders and scaffolding, walking on rubble, navigating debris — basically nothing works yet. This is why Boston Dynamics' Spot dog dominates radiation and disaster cleanup work today."},
+    },
+    refs:[
+      {title:'Georgia Tech — Robots learning to walk more steadily', url:'https://news.gatech.edu/news/2026/02/18/humanoid-robots-make-confident-strides-toward-walking-stability'},
+      {title:'Research on robots that fall safely', url:'https://arxiv.org/pdf/2511.18509'},
+      {title:'Academic survey on humanoid walking and grabbing', url:'https://arxiv.org/abs/2501.02116'},
+    ],
+  },
+  {
+    id:'power', num:'04', name:'Battery Life',
+    short:'How long the robot can run before needing a charge',
+    definition:"How long does the robot last on one battery? How fast can it recharge or swap batteries? And can the battery handle the bursts of power needed for fast hand movements without overheating? Real usefulness depends on how much actual work-time you get versus charging time.",
+    sota:"Most humanoid robots run 1.5 to 4 hours on a charge — far less than a human shift. The Chinese company UBTECH solved part of this in 2025 with a robot that swaps its own batteries in 3 minutes, letting it run 24/7. Newer battery types (called 'solid-state' batteries) promise longer runtimes but aren't in mass production yet. The catch: under heavy use, batteries wear out 3-4x faster than the manufacturer claims.",
+    approaches:[
+      {angle:'operations', name:'Build batteries that humans swap quickly by hand', players:"Apptronik's Apollo, Boston Dynamics' Atlas", bet:"Don't fix the battery, just make swapping fast"},
+      {angle:'design', name:'Build robots that swap their own batteries', players:'UBTECH (the first to ship this)', bet:'Fully automated 24/7 operation'},
+      {angle:'design', name:'Wait for better battery chemistry', players:'Hyundai/Samsung, LG Energy Solution', bet:'Solid-state batteries will solve this in a few years'},
+      {angle:'control', name:'Use software to make the battery last longer', players:"Agility Robotics' fleet management software", bet:'Smart task scheduling stretches every charge'},
+    ],
+    subnodes:['Battery type that handles big power bursts','Keeping the battery cool',"Making sure batteries don't catch fire",'Standard chargers that work across brands','Standard battery shapes across brands','Containing fires if they happen','How fast batteries actually wear out in real use','Recovering energy when the robot stops moving'],
+    contexts:{
+      manufacturing:{intensity:4, note:"A 10-hour factory shift with a 30-minute lunch break is a perfect window for swapping batteries. BMW's pilot worked the robots hard — 1.2 million steps over 1,250 hours — and battery wear was a real cost."},
+      warehousing:{intensity:5, note:"Warehouses run 24/7 in three shifts. Either the robot can swap its own battery automatically, or it can't keep up. This is the dominant challenge for warehouse deployment."},
+      healthcare:{intensity:3, note:'Hospital tasks tend to be lower-intensity (standing, light carrying). But fire safety matters enormously in oxygen-rich rooms — a battery fire near patients would be catastrophic.'},
+      home:{intensity:3, note:"Most home robots will sit idle most of the time, then do short bursts of work. The bigger concern: insurance companies are nervous about a lithium battery fire in your living room."},
+      hazardous:{intensity:4, note:'A 90-minute battery limits how long a robot can stay in a radioactive zone. Adding shielding makes the robot heavier, which kills the battery even faster — a vicious cycle.'},
+    },
+    refs:[
+      {title:'Battery industry forecast for solid-state batteries', url:'https://www.trendforce.com/presscenter/news/20260128-12902.html'},
+      {title:"How UBTECH's self-swapping battery works", url:'https://aibusiness.com/robotics/humanoid-robot-changes-its-own-batteries'},
+      {title:'Bain & Company — From demos to real deployment', url:'https://www.bain.com/insights/humanoid-robots-from-demos-to-deployment-technology-report-2025/'},
+    ],
+  },
+  {
+    id:'data', num:'05', name:'Teaching Robots New Tasks',
+    short:'How robots learn — and why they need so many examples',
+    definition:"AI like ChatGPT learned by reading basically everything humans have ever written online — trillions of words. Robots can't do that. There's no internet of 'videos of someone folding a fitted sheet from the robot's perspective.' So how do you collect enough examples for a robot to learn how to do real-world tasks? This is sometimes called 'the robot data problem.'",
+    sota:"The biggest robot training dataset right now has about 10,000 hours of recorded robot actions — tiny compared to the trillions of words used to train ChatGPT. Companies are using a few clever tricks: practicing in 3D simulations (1,000x faster than real time), having humans wear special gloves to record demonstrations, and using YouTube videos of people doing things. None of these have quite cracked the problem yet.",
+    approaches:[
+      {angle:'data', name:'Hire lots of humans to remotely operate robots and record what they do', players:'Tesla, Figure, 1X, Apptronik', bet:'If you collect enough demonstrations, the robot will learn'},
+      {angle:'operations', name:'Make AI models open-source so everyone can improve them together', players:'Physical Intelligence, UC Berkeley, NVIDIA', bet:'Like Linux for robots — community effort beats any single company'},
+      {angle:'data', name:'Train robots in realistic computer simulations', players:'NVIDIA, Google DeepMind, several startups', bet:'A computer can practice 1000 lifetimes of tasks in a day'},
+      {angle:'data', name:'Learn from YouTube videos of humans doing things', players:'Google DeepMind and others', bet:"There's already a huge library of human behavior on the internet"},
+      {angle:'data', name:'Train one robot, deploy on many different robot bodies', players:'Open X-Embodiment research effort', bet:'A skill learned once should work everywhere'},
+    ],
+    subnodes:['Cost of paying humans to demonstrate tasks','Skills learned on one robot working on a different robot','Gap between simulation and the real world','Practicing rare situations like emergencies','Predicting sequences of actions, not just one','Continuing to improve after the robot is shipped','Who owns the data robots collect on the job','Running the AI fast enough on a small computer'],
+    contexts:{
+      manufacturing:{intensity:3, note:'Factory tasks are repetitive and predictable, which is great for training. BMW collected real factory data that helped Figure design their next-generation robot.'},
+      warehousing:{intensity:3, note:'Warehouses are tractable but the variety of products is huge. Agility Robotics pools data from all their deployed robots to make all of them smarter.'},
+      healthcare:{intensity:5, note:'Every patient is different. Medical privacy laws (HIPAA, GDPR) make it nearly impossible to share training data between hospitals. Massive bottleneck.'},
+      home:{intensity:5, note:'Worst case. Every home is different. The list of things that can happen in a home is essentially infinite. 1X is using human remote operators to bootstrap data, but the hill to climb is enormous.'},
+      hazardous:{intensity:5, note:"Disaster sites and nuclear cleanups are by definition rare events with almost no training data. Simulations are the only option, but they don't fully capture how real radiation, dust, and damage behave."},
+    },
+    refs:[
+      {title:'Physical Intelligence — Their first generalist robot AI', url:'https://www.pi.website/blog/pi0'},
+      {title:"NVIDIA's open-source robot AI announcement", url:'https://nvidianews.nvidia.com/news/nvidia-isaac-gr00t-n1-open-humanoid-robot-foundation-model-simulation-frameworks'},
+      {title:'OpenVLA — Open-source robot intelligence', url:'https://arxiv.org/pdf/2406.09246'},
+    ],
+  },
+  {
+    id:'safety', num:'06', name:'Safety & Rules',
+    short:"Standards, insurance, and what's legally allowed",
+    definition:"For robots to work next to humans without cages, society needs new safety rules, insurance products, and legal frameworks. What happens if a robot falls on someone? Who's responsible if a robot hurts a person? These questions don't have clean answers yet, and that's a real obstacle to deployment.",
+    sota:"A new international safety standard for walking robots is being written right now (called ISO 25785-1) but won't be finalized until 2026 or 2027. In a milestone moment, Agility Robotics' Digit became the first humanoid to pass an OSHA-recognized safety inspection in a working warehouse. Until standards are finalized, most robots still have to be physically separated from humans by barriers — defeating part of the point.",
+    approaches:[
+      {angle:'design', name:'Add traditional safety hardware (emergency stops, sensors)', players:'Established safety component makers', bet:'Use proven engineering with certifications'},
+      {angle:'design', name:'Make the robot itself inherently gentle', players:"Apptronik (force-controlled motors), 1X (springy tendons)", bet:"A robot that physically can't hit hard is safer"},
+      {angle:'standards', name:"Continuously monitor robots and prove they're safe with data", players:'Compliance software companies', bet:'Live data is more reassuring than a one-time inspection'},
+      {angle:'design', name:'Just use wheels instead of legs', players:'Some Apptronik and Agility variants', bet:"A robot that can't fall over has way fewer safety problems"},
+    ],
+    subnodes:['Measuring how likely the robot is to fall','Testing how easy it is to push the robot over','Certifying AI-controlled motion (no rules exist yet)','Hacking and cybersecurity','Who pays when something goes wrong (the maker? the user?)',"Privacy when robots have cameras and microphones",'Battery fire safety','Different countries have different rules'],
+    contexts:{
+      manufacturing:{intensity:4, note:"Existing factory rules can mostly cover today's pilots, but robots usually still have physical barriers. BMW added partitions in their pilot. Truly working without barriers is what experts call 'the final hurdle.'"},
+      warehousing:{intensity:3, note:'Warehouses already have rules for autonomous robots driving around, so humanoids slot in more easily. Agility Robotics has the most mature monitoring software in the industry.'},
+      healthcare:{intensity:5, note:'Hardest case. Touching patients is a much higher bar than touching factory parts. The FDA has no clear approval pathway for robots that physically help patients.'},
+      home:{intensity:5, note:'Almost no rules exist. Insurance for an injury caused by a humanoid in your home is largely uncharted. Privacy regulators care about cameras inside your house. Lots of unanswered questions.'},
+      hazardous:{intensity:2, note:"Different game entirely. The whole point is that the robot replaces a human in a place too dangerous for humans, so worker safety is much less of a concern. Cybersecurity (preventing hackers from taking over the robot) becomes the bigger worry."},
+    },
+    refs:[
+      {title:'The new ISO standard for walking robots', url:'https://www.iso.org/standard/91469.html'},
+      {title:'Industry overview — where humanoids stand', url:'https://www.automate.org/industry-insights/humanoid-robots-are-evolving'},
+      {title:'Tech Briefs — Setting safety standards for humanoids', url:'https://www.techbriefs.com/component/content/article/53111-safety-in-motion-setting-the-standard-for-humanoid-robots'},
+    ],
+  },
+  {
+    id:'cost', num:'07', name:'Cost & Where Parts Come From',
+    short:'Making the price drop, and dealing with China dependency',
+    definition:"Right now, building a humanoid robot is expensive — most cost between $30,000 and $250,000 to build. For robots to actually replace human labor or sell to homes, prices need to drop a lot. There's also a big question about supply chain: most of the specialized parts (motors, joints) come from China, which creates business and political risk for non-Chinese makers.",
+    sota:"Build costs are dropping fast — Goldman Sachs reports about 40% per year. The cost of building a robot dropped from $50,000-$250,000 in 2023 to $30,000-$150,000 in 2025. About 40-60% of that cost is the motors and joints. China makes about 70% of the specialized parts that go into humanoid robots, including 90% of the magnets in the motors. Chinese investors poured $7 billion into 610 robotics deals in just the first 9 months of 2025.",
+    approaches:[
+      {angle:'cost', name:'Make every part yourself', players:'Tesla, Figure, Sanctuary, 1X', bet:'Owning the whole stack means lower costs over time'},
+      {angle:'cost', name:"Lean on China's mature parts ecosystem", players:'Unitree, UBTECH, AgiBot, BYD', bet:'Move fast and undercut on price'},
+      {angle:'operations', name:'Partner with established contract manufacturers', players:'Apptronik with Jabil; Boston Dynamics with Hyundai', bet:'Use companies that already know how to mass-produce'},
+      {angle:'cost', name:'Reuse electric vehicle parts', players:'Chinese carmakers branching into robots', bet:'EV motors and batteries transfer directly to robots'},
+    ],
+    subnodes:['Specialized gearboxes (mostly made in Japan)','Roller screws (very narrow set of suppliers)','High-quality motors (Maxon, Kollmorgen)','Force sensors','Touch sensors','Battery cells','AI computer chips','Rare earth metals (China dominates)','Tariffs and export controls between countries'],
+    contexts:{
+      manufacturing:{intensity:3, note:'Big carmakers like BMW and Mercedes can absorb a $150,000 price tag because the savings on labor, ergonomics, and quality justify it.'},
+      warehousing:{intensity:4, note:"Warehouses lease robots by the hour for $10-12, which works because Digit's ~$250,000 price spread over 24/7 use beats a human at $30/hour. But for smaller warehouse companies to adopt, prices have to keep dropping."},
+      healthcare:{intensity:4, note:"Hospitals don't yet have a way to bill insurance for 'robot care,' which makes it hard to know what they can pay."},
+      home:{intensity:5, note:'A consumer robot has to be under $20,000 to find a market — and the cheap models that hit that price (mostly Chinese) are very limited in what they can do today.'},
+      hazardous:{intensity:2, note:'Utilities, defense, and oil companies will happily pay $100,000+ for inspection robots because the alternative is putting humans in dangerous places. Robots that can do hands-on cleanup work would be valued even higher.'},
+    },
+    refs:[
+      {title:'McKinsey — The robot supply chain', url:'https://www.mckinsey.com/industries/industrials/our-insights/turning-humanoid-supply-chain-constraints-into-billion-dollar-wins'},
+      {title:'Goldman Sachs — Humanoid market forecast', url:'https://www.goldmansachs.com/insights/articles/the-global-market-for-robots-could-reach-38-billion-by-2035'},
+      {title:'Industry analysis — humanoid robot economics', url:'https://www.edge-ai-vision.com/2025/11/humanoid-robots-2025-the-race-to-useful-intelligence/'},
+    ],
+  },
+  {
+    id:'software', num:'08', name:'Software & Brain',
+    short:'The AI that runs the robot, plus connecting to business systems',
+    definition:"Beyond the AI that controls the robot, there's a layer of software that manages whole fleets of robots and connects them to a company's existing systems (like inventory software, manufacturing trackers, and so on). As robot hardware becomes more standardized, this software is becoming where the real money is made.",
+    sota:"There's a split right now between open-source robot AI (anyone can use it, like π0 and OpenVLA) and proprietary AI from companies like Tesla and Figure. Agility Robotics has the most advanced fleet management software, letting customers see how all their robots are doing in real time. The hard problem: every warehouse and factory has different existing software, and connecting humanoid robots to that software is custom work every time.",
+    approaches:[
+      {angle:'control', name:'One giant AI model controls everything', players:'Figure, 1X', bet:'The same scaling magic that made ChatGPT will work for robots'},
+      {angle:'control', name:'Two AI models — a fast one for reflexes, a slow one for thinking', players:'NVIDIA, Physical Intelligence', bet:'Mimic how human brains separate reflexes from reasoning'},
+      {angle:'control', name:'Combine new AI with proven traditional software', players:'Boston Dynamics, Agility', bet:'Reliability matters more than fancy AI for industrial use'},
+      {angle:'control', name:'Use a language model as the planner', players:'Apptronik working with Google DeepMind', bet:'Talk to the robot in natural language'},
+      {angle:'operations', name:'Sell robots as a subscription service with great fleet software', players:'Agility, UBTECH, Apptronik', bet:'The recurring software revenue is bigger than the hardware sale'},
+    ],
+    subnodes:['Running big AI fast on a small computer in the robot','Working with or without an internet connection','Connecting to company systems (inventory, manufacturing, HR)','Many robots learning from each other','Tracking what robots are doing for safety','Software updates over the air','Cybersecurity','Coordinating swarms of robots together','Practicing in a virtual copy of the workplace'],
+    contexts:{
+      manufacturing:{intensity:4, note:"Connecting robots to factory IT systems is often the actual hard part. BMW spent years getting their data systems unified before they did the robot pilot. Most factories don't have that foundation yet."},
+      warehousing:{intensity:3, note:"Warehouse software is more standardized than factory software, which makes integration easier. Amazon's mix of robots and humanoids is the most advanced example."},
+      healthcare:{intensity:4, note:'Hospital records (EHR) are highly regulated. The robot has to log everything in HIPAA-compliant ways and might fall under FDA software rules.'},
+      home:{intensity:4, note:"Home robots create whole new failure modes — what if the Wi-Fi goes down? What if the cloud server crashes? Privacy worries are real, especially for robots like NEO that have remote human operators."},
+      hazardous:{intensity:4, note:"Often the robot is operating somewhere with no internet connection (radiation zone, disaster site). The software has to handle being offline. Cybersecurity also matters more — you don't want a hacker taking over a robot in a nuclear plant."},
+    },
+    refs:[
+      {title:'Figure AI — How they architected their robot brain', url:'https://www.figure.ai/news/production-at-bmw'},
+      {title:'Agility Robotics — Their fleet management platform', url:'https://www.agilityrobotics.com/content/digits-next-steps'},
+      {title:'World Economic Forum — Physical AI in industry', url:'https://reports.weforum.org/docs/WEF_Physical_AI_Powering_the_New_Age_of_Industrial_Operations_2025.pdf'},
+    ],
+  },
+];
+
+const CONTEXTS = [
+  {id:'manufacturing', name:'Factories', desc:'Building cars, electronics, things'},
+  {id:'warehousing',   name:'Warehouses', desc:'Moving boxes, shipping orders'},
+  {id:'healthcare',    name:'Hospitals', desc:'Helping patients and staff'},
+  {id:'home',          name:'Homes', desc:'Chores, cooking, helping family'},
+  {id:'hazardous',     name:'Dangerous Places', desc:'Nuclear, oil rigs, disaster zones'},
+];
+
+const LENSES = [
+  {id:'all',       name:'Just curious',             desc:'Show me everything as is',                    weights:null},
+  {id:'industrial',name:'Where it works today',     desc:'Highlights near-term deployment settings',    weights:{warehousing:1.4,manufacturing:1.2,healthcare:0.6,home:0.3,hazardous:0.7}},
+  {id:'hardware',  name:'The physical body',         desc:'Hands, motors, batteries',                   weights:null, focus:['dexterity','cost','power']},
+  {id:'software',  name:'The brain',                 desc:'AI challenges — vision, learning, software', weights:null, focus:['data','software','perception']},
+  {id:'deeptech',  name:'The hardest unsolved stuff',desc:'Problems that may take a decade to crack',   weights:null, focus:['dexterity','data','safety']},
+];
+
+const ANGLES = {
+  design:    {label:'Design',     desc:"Mechanical form — what shape, materials, how it's built",      color:'#7eb8d4'},
+  cost:      {label:'Cost',       desc:'Manufacturing economics, supply chain, parts at scale',         color:'#e8b87a'},
+  data:      {label:'Data',       desc:'How the robot learns — training, demos, simulations',           color:'#c89bc7'},
+  control:   {label:'Control',    desc:'The AI and software running the robot in real time',            color:'#9bc89b'},
+  operations:{label:'Operations', desc:'Deployment models — how robots get used in the field',          color:'#e89b9b'},
+  standards: {label:'Standards',  desc:'Rules, certification, governance, monitoring',                  color:'#d4c878'},
+};
+
+// ── COLOUR ───────────────────────────────────────────────────
+function heat(intensity, alpha=1) {
+  const s = {1:[80,80,90],2:[140,100,70],3:[200,130,60],4:[240,150,60],5:[255,100,70]};
+  const [r,g,b] = s[intensity]||s[1];
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// ── ICOSAHEDRON ───────────────────────────────────────────────
+function Icosahedron() {
+  return (
+    <div style={{width:60,height:60,flex:'none',color:'#f5c976',marginTop:4}}>
+      <svg viewBox="0 0 100 100" style={{width:'100%',height:'100%',animation:'icosa-spin 22s linear infinite',filter:'drop-shadow(0 0 8px rgba(245,201,118,0.5))'}}>
+        <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
+          <polygon points="50,8 89,30 89,70 50,92 11,70 11,30"/>
+          <polygon points="50,8 89,30 50,50"/>
+          <polygon points="89,30 89,70 50,50"/>
+          <polygon points="89,70 50,92 50,50"/>
+          <polygon points="50,92 11,70 50,50"/>
+          <polygon points="11,70 11,30 50,50"/>
+          <polygon points="11,30 50,8 50,50"/>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+// ── PARALLAX LATTICE ─────────────────────────────────────────
+function ParallaxLattice({mx,my}) {
+  const dots = useMemo(()=>{
+    const a=[];
+    for(let r=0;r<7;r++) for(let c=0;c<13;c++)
+      a.push({x:(c/12)*100,y:(r/6)*100,o:0.06+Math.abs(Math.sin(r*1.9+c*0.8))*0.1});
+    return a;
+  },[]);
+  return (
+    <div style={{position:'absolute',inset:-40,pointerEvents:'none',zIndex:0,
+      transform:`perspective(900px) rotateX(${my*4}deg) rotateY(${mx*-4}deg)`,
+      transition:'transform 0.35s cubic-bezier(.2,.8,.2,1)',transformStyle:'preserve-3d'}}>
+      {dots.map((d,i)=>(
+        <div key={i} style={{position:'absolute',left:`${d.x}%`,top:`${d.y}%`,
+          width:2,height:2,borderRadius:'50%',background:'#f5c976',opacity:d.o,
+          transform:'translate(-50%,-50%)'}}/>
+      ))}
+    </div>
+  );
+}
+
+// ── MODAL ────────────────────────────────────────────────────
+function Modal({children,onClose}) {
+  useEffect(()=>{
+    const handler = e => { if(e.key==='Escape') onClose(); };
+    document.addEventListener('keydown',handler);
+    document.body.style.overflow = 'hidden';
+    return ()=>{ document.removeEventListener('keydown',handler); document.body.style.overflow=''; };
+  },[onClose]);
+  return (
+    <div onClick={onClose} style={{position:'fixed',inset:0,background:'rgba(5,5,18,0.9)',backdropFilter:'blur(10px)',
+      display:'flex',alignItems:'flex-start',justifyContent:'center',padding:'40px 20px',
+      zIndex:200,overflowY:'auto',animation:'fade-up 0.2s ease-out'}}>
+      <div onClick={e=>e.stopPropagation()} style={{
+        background:'linear-gradient(180deg,#1a1730 0%,#13112a 100%)',
+        border:'1px solid rgba(245,201,118,0.2)',
+        boxShadow:'0 32px 80px rgba(0,0,0,0.7),0 0 60px rgba(100,80,200,0.15)',
+        maxWidth:740,width:'100%',maxHeight:'calc(100vh - 80px)',overflow:'auto',
+        position:'relative',animation:'modal-in 0.3s cubic-bezier(.2,.8,.2,1)'}}>
+        <button onClick={onClose} style={{position:'absolute',top:16,right:16,width:36,height:36,
+          display:'flex',alignItems:'center',justifyContent:'center',color:'#7a7460',
+          background:'rgba(245,201,118,0.04)',border:'1px solid rgba(245,201,118,0.12)',
+          transition:'all .2s',zIndex:2,cursor:'pointer'}}
+          onMouseEnter={e=>{e.currentTarget.style.borderColor='var(--gold)';e.currentTarget.style.color='var(--gold)';}}
+          onMouseLeave={e=>{e.currentTarget.style.borderColor='rgba(245,201,118,0.12)';e.currentTarget.style.color='#7a7460';}}>
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" strokeWidth="1.5"/>
+          </svg>
+        </button>
+        <div style={{padding:'40px 40px'}}>{children}</div>
+      </div>
+    </div>
+  );
+}
+
+// ── KICKER ───────────────────────────────────────────────────
+function Kicker({children,style={}}) {
+  return <div style={{fontFamily:'var(--font-mono)',fontSize:11,letterSpacing:'0.16em',
+    textTransform:'uppercase',color:'#f5c976',marginBottom:10,
+    textShadow:'0 0 10px rgba(245,201,118,0.3)',...style}}>{children}</div>;
+}
+
+// ── MAIN APP ─────────────────────────────────────────────────
+function App() {
+  const [selectedCell, setSelectedCell] = useState(null);
+  const [selectedB, setSelectedB] = useState(null);
+  const [lens, setLens] = useState('all');
+  const [hovered, setHovered] = useState(null);
+  const [mx, setMx] = useState(0);
+  const [my, setMy] = useState(0);
+  const [tick, setTick] = useState(0);
+  const mapRef = useRef(null);
+
+  const activeLens = LENSES.find(l=>l.id===lens);
+
+  const getI = (b,c) => {
+    const raw = b.contexts[c.id].intensity;
+    if(!activeLens||activeLens.id==='all') return raw;
+    if(activeLens.weights) return Math.min(5,Math.max(1,Math.round(raw*(activeLens.weights[c.id]??1))));
+    if(activeLens.focus) return activeLens.focus.includes(b.id)?raw:Math.max(1,raw-2);
+    return raw;
+  };
+
+  const isFocused = b => !activeLens||activeLens.id==='all'||!activeLens.focus||activeLens.focus.includes(b.id);
+
+  const recs = useMemo(()=>{
+    const s=[];
+    BOTTLENECKS.forEach(b=>CONTEXTS.forEach(c=>s.push({b,c,i:getI(b,c)})));
+    return s.sort((a,b)=>b.i-a.i).slice(0,3);
+  },[lens]);
+
+  useEffect(()=>{ setTick(t=>t+1); },[lens]);
+
+  useEffect(()=>{
+    let raf=null;
+    const h = e => {
+      if(!mapRef.current) return;
+      if(raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(()=>{
+        const r = mapRef.current.getBoundingClientRect();
+        setMx(Math.max(-1,Math.min(1,(e.clientX-r.left-r.width/2)/(r.width*.6))));
+        setMy(Math.max(-1,Math.min(1,(e.clientY-r.top-r.height/2)/(r.height*.8))));
+      });
+    };
+    window.addEventListener('mousemove',h);
+    return ()=>{ window.removeEventListener('mousemove',h); if(raf) cancelAnimationFrame(raf); };
+  },[]);
+
+  const cellB = selectedCell ? BOTTLENECKS.find(b=>b.id===selectedCell.bid) : null;
+  const cellC = selectedCell ? CONTEXTS.find(c=>c.id===selectedCell.cid) : null;
+  const bData = selectedB ? BOTTLENECKS.find(b=>b.id===selectedB) : null;
+
+  const S = {
+    wrap:{maxWidth:1280,margin:'0 auto',padding:'0 40px 80px',position:'relative',zIndex:1},
+    lensRow:{display:'grid',gridTemplateColumns:'200px 1fr',gap:32,alignItems:'flex-start',marginBottom:56},
+    lensGrid:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:8},
+    lensBtn:{padding:'12px 14px',background:'rgba(18,16,36,0.6)',border:'1px solid rgba(245,201,118,0.1)',
+      transition:'all .2s',backdropFilter:'blur(4px)',cursor:'pointer'},
+    lensBtnA:{background:'rgba(245,201,118,0.08)',border:'1px solid rgba(245,201,118,0.5)',
+      boxShadow:'0 0 20px rgba(245,201,118,0.18),inset 0 0 10px rgba(245,201,118,0.05)'},
+    mapGridWrap:{position:'relative'},
+    grid:{display:'grid',gridTemplateColumns:'minmax(200px,260px) repeat(5,1fr)',gap:5,position:'relative',zIndex:2},
+    ctxHead:{padding:'10px 6px',borderBottom:'1px solid rgba(245,201,118,0.1)'},
+    bRow:{padding:'12px 10px 12px 0',display:'grid',gridTemplateColumns:'30px 1fr 16px',
+      alignItems:'center',gap:6,borderRight:'1px solid rgba(245,201,118,0.08)',
+      cursor:'pointer',transition:'all .2s'},
+    cell:{aspectRatio:'1.6/1',minHeight:58,border:'1px solid rgba(255,255,255,0.06)',
+      display:'flex',alignItems:'center',justifyContent:'center',
+      transition:'all .2s cubic-bezier(.2,.8,.2,1)',cursor:'pointer'},
+    recoGrid:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:12},
+    recoCard:{padding:'18px 20px',background:'rgba(18,16,36,0.6)',border:'1px solid rgba(245,201,118,0.1)',
+      display:'grid',gridTemplateColumns:'36px 1fr',gap:10,transition:'all .2s',
+      backdropFilter:'blur(4px)',cursor:'pointer'},
+    /* modal internals */
+    mKicker:{fontFamily:'var(--font-mono)',fontSize:11,letterSpacing:'0.16em',textTransform:'uppercase',
+      color:'#f5c976',marginBottom:10,textShadow:'0 0 8px rgba(245,201,118,0.3)'},
+    mTitle:{fontFamily:'var(--font-display)',fontSize:28,fontWeight:400,color:'#e8e4dc',
+      margin:'0 0 6px',lineHeight:1.15,letterSpacing:'-0.01em'},
+    mLede:{fontSize:14,color:'#a8a39a',fontStyle:'italic',margin:'0 0 20px'},
+    mSection:{marginBottom:24,paddingTop:18,borderTop:'1px solid rgba(245,201,118,0.08)'},
+    mLabel:{fontFamily:'var(--font-mono)',fontSize:10,letterSpacing:'0.16em',textTransform:'uppercase',
+      color:'#7a7460',marginBottom:10},
+    mProse:{fontSize:14,color:'#d4cfc4',lineHeight:1.65,margin:0},
+    mSub:{fontSize:13,color:'#a8a39a',lineHeight:1.6,margin:0,fontStyle:'italic'},
+    mCta:{display:'inline-block',marginTop:14,padding:'11px 18px',background:'transparent',
+      border:'1px solid #f5c976',color:'#f5c976',fontSize:13,transition:'all .2s',
+      cursor:'pointer',boxShadow:'0 0 14px rgba(245,201,118,0.12)'},
+    pipRow:{display:'flex',alignItems:'center',gap:4,marginBottom:24},
+    pip:{width:30,height:7,transition:'background .3s',transformOrigin:'bottom'},
+    approachList:{display:'flex',flexDirection:'column',gap:12},
+    approachItem:{paddingLeft:14,borderLeft:'2px solid rgba(245,201,118,0.3)',transition:'border-color .15s'},
+    aPill:{fontFamily:'var(--font-mono)',fontSize:9,letterSpacing:'0.14em',textTransform:'uppercase',
+      fontWeight:500,padding:'2px 7px',border:'1px solid',flex:'none',cursor:'help'},
+    aHead:{display:'flex',alignItems:'baseline',gap:8,marginBottom:3,flexWrap:'wrap'},
+    aName:{fontFamily:'var(--font-display)',fontSize:15,color:'#e8e4dc'},
+    aMeta:{fontSize:12,color:'#a8a39a',lineHeight:1.5},
+    aLabel:{fontFamily:'var(--font-mono)',fontSize:10,color:'#7a7460',textTransform:'uppercase',letterSpacing:'0.08em'},
+    aHint:{fontSize:12,color:'#7a7460',fontStyle:'italic',marginTop:-6,marginBottom:12,lineHeight:1.5},
+    legend:{marginTop:16,paddingTop:12,borderTop:'1px dashed rgba(245,201,118,0.1)',
+      display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:8},
+    legendItem:{display:'grid',gridTemplateColumns:'8px 1fr',gap:8,alignItems:'flex-start'},
+    legendLabel:{fontFamily:'var(--font-mono)',fontSize:9,letterSpacing:'0.14em',
+      textTransform:'uppercase',fontWeight:500,marginBottom:2},
+    legendDesc:{fontSize:11,color:'#7a7460',lineHeight:1.4},
+    subnodeGrid:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:5},
+    subnode:{fontSize:12,color:'#c4bfb4',padding:'9px 11px',
+      background:'rgba(245,201,118,0.04)',borderLeft:'2px solid rgba(245,201,118,0.22)'},
+    ctxList:{display:'flex',flexDirection:'column',gap:12},
+    ctxItem:{paddingTop:10,borderTop:'1px solid rgba(245,201,118,0.06)'},
+    ctxHeader:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:5},
+    ctxName:{fontFamily:'var(--font-display)',fontSize:15,color:'#e8e4dc'},
+    ctxBar:{width:72,height:3,background:'rgba(245,201,118,0.08)'},
+    ctxFill:{height:'100%',transition:'all .5s'},
+    ctxNote:{fontSize:12,color:'#a8a39a',lineHeight:1.55},
+    refList:{display:'flex',flexDirection:'column',gap:6},
+    refLink:{fontSize:12,color:'#f5c976',textDecoration:'none',padding:'5px 0',
+      borderBottom:'1px solid rgba(245,201,118,0.1)',transition:'color .2s'},
+  };
+
+  return (
+    <div style={S.wrap}>
+      {/* LENS */}
+      <div style={S.lensRow}>
+        <div>
+          <Kicker>01 — Pick a perspective</Kicker>
+          <div style={{fontSize:13,color:'#7a7460',lineHeight:1.5}}>
+            The grid highlights what matters most for the angle you care about.
+          </div>
+        </div>
+        <div style={S.lensGrid}>
+          {LENSES.map(l=>(
+            <button key={l.id} onClick={()=>setLens(l.id)}
+              style={{...S.lensBtn,...(lens===l.id?S.lensBtnA:{})}}>
+              <div style={{fontWeight:500,fontSize:13,marginBottom:3,color:'#e8e4dc'}}>{l.name}</div>
+              <div style={{fontSize:11,color:'#7a7460',lineHeight:1.4}}>{l.desc}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* MAP */}
+      <div style={{marginBottom:64}} ref={mapRef}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-end',
+          marginBottom:16,flexWrap:'wrap',gap:12,position:'relative',zIndex:2}}>
+          <Kicker style={{marginBottom:0}}>02 — The grid: what's hard, where</Kicker>
+          <div style={{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}>
+            <span style={{fontFamily:'var(--font-mono)',fontSize:10,color:'#7a7460',
+              textTransform:'uppercase',letterSpacing:'0.08em'}}>How big a problem</span>
+            <div style={{display:'flex',gap:2}}>
+              {[1,2,3,4,5].map(i=>(
+                <div key={i} style={{width:22,height:22,background:heat(i,1),
+                  boxShadow:`0 0 6px ${heat(i,0.4)}`,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  <span style={{fontFamily:'var(--font-mono)',fontSize:10,color:'#fff',fontWeight:500}}>{i}</span>
+                </div>
+              ))}
+            </div>
+            <span style={{fontFamily:'var(--font-mono)',fontSize:10,color:'#5d5849'}}>
+              1 = mostly figured out · 5 = major roadblock
+            </span>
+          </div>
+        </div>
+
+        <div style={S.mapGridWrap}>
+          <ParallaxLattice mx={mx} my={my}/>
+          <div style={S.grid} key={tick}>
+            <div/>
+            {CONTEXTS.map(c=>(
+              <div key={c.id} style={S.ctxHead}>
+                <div style={{fontFamily:'var(--font-display)',fontSize:15,color:'#e8e4dc',marginBottom:2}}>{c.name}</div>
+                <div style={{fontSize:11,color:'#7a7460'}}>{c.desc}</div>
+              </div>
+            ))}
+            {BOTTLENECKS.map((b,ri)=>(
+              <React.Fragment key={b.id}>
+                <button onClick={()=>setSelectedB(b.id)}
+                  style={{...S.bRow,opacity:isFocused(b)?1:0.3}}
+                  onMouseEnter={e=>{ if(isFocused(b)) e.currentTarget.style.paddingLeft='6px'; }}
+                  onMouseLeave={e=>{ e.currentTarget.style.paddingLeft='0'; }}>
+                  <div style={{fontFamily:'var(--font-mono)',fontSize:11,color:'#7a7460'}}>{b.num}</div>
+                  <div>
+                    <div style={{fontFamily:'var(--font-display)',fontSize:16,color:'#e8e4dc',marginBottom:1}}>{b.name}</div>
+                    <div style={{fontSize:11,color:'#7a7460'}}>{b.short}</div>
+                  </div>
+                  <div style={{color:'#7a7460',fontSize:16}}>›</div>
+                </button>
+                {CONTEXTS.map((c,ci)=>{
+                  const intensity = getI(b,c);
+                  const focused = isFocused(b);
+                  const isH = hovered?.b===b.id && hovered?.c===c.id;
+                  const delay = (ri*5+ci)*0.022;
+                  return (
+                    <button key={`${b.id}-${c.id}`}
+                      onClick={()=>setSelectedCell({bid:b.id,cid:c.id})}
+                      onMouseEnter={()=>setHovered({b:b.id,c:c.id})}
+                      onMouseLeave={()=>setHovered(null)}
+                      style={{...S.cell,
+                        background:heat(intensity,focused?1:0.28),
+                        boxShadow:focused?`inset 0 0 14px ${heat(intensity,0.35)},0 0 ${isH?20:5}px ${heat(intensity,isH?0.65:0.18)}`:'none',
+                        transform:isH?'scale(1.07)':'scale(1)',
+                        zIndex:isH?5:1,
+                        borderColor:isH?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.06)',
+                        animation:`cell-in 0.5s cubic-bezier(.2,.8,.2,1) ${delay}s both`,
+                      }}>
+                      <span style={{fontFamily:'var(--font-mono)',fontSize:15,fontWeight:500,
+                        color:'#fff',textShadow:'0 1px 4px rgba(0,0,0,0.6)'}}>{intensity}</span>
+                    </button>
+                  );
+                })}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* RECO */}
+      <div style={{marginBottom:60}}>
+        <Kicker>03 — The biggest roadblocks under "{activeLens.name}"</Kicker>
+        <div style={S.recoGrid} key={`r${tick}`}>
+          {recs.map(({b,c,i},idx)=>(
+            <button key={`${b.id}${c.id}${idx}`}
+              onClick={()=>setSelectedCell({bid:b.id,cid:c.id})}
+              style={{...S.recoCard,animation:`fade-up 0.5s ease-out ${idx*0.08}s both`}}
+              onMouseEnter={e=>{ e.currentTarget.style.borderColor='rgba(245,201,118,0.3)'; e.currentTarget.style.boxShadow='0 0 24px rgba(245,201,118,0.12)'; }}
+              onMouseLeave={e=>{ e.currentTarget.style.borderColor='rgba(245,201,118,0.1)'; e.currentTarget.style.boxShadow='none'; }}>
+              <div style={{fontFamily:'var(--font-display)',fontSize:26,color:'#f5c976',fontStyle:'italic',
+                lineHeight:1,textShadow:'0 0 8px rgba(245,201,118,0.4)'}}>0{idx+1}</div>
+              <div>
+                <div style={{fontFamily:'var(--font-display)',fontSize:17,color:'#e8e4dc',marginBottom:3}}>{b.name}</div>
+                <div style={{fontSize:12,color:'#a8a39a',marginBottom:10}}>in <strong>{c.name}</strong></div>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <div style={{height:3,width:`${i*20}%`,minWidth:32,maxWidth:90,
+                    background:heat(i,1),boxShadow:`0 0 6px ${heat(i,0.7)}`,transition:'all .5s'}}/>
+                  <span style={{fontFamily:'var(--font-mono)',fontSize:10,color:'#7a7460'}}>{i}/5</span>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* CELL MODAL */}
+      {selectedCell && cellB && cellC && (
+        <Modal onClose={()=>setSelectedCell(null)}>
+          <div style={S.mKicker}>Challenge {cellB.num} × {cellC.name}</div>
+          <h2 style={S.mTitle}>{cellB.name} in {cellC.name}</h2>
+          <div>
+            <div style={S.mLabel}>How big a problem is this here?</div>
+            <div style={S.pipRow}>
+              {[1,2,3,4,5].map(n=>{
+                const intensity = getI(cellB,cellC);
+                return <div key={n} style={{...S.pip,
+                  background:n<=intensity?heat(intensity,1):'rgba(255,255,255,0.08)',
+                  boxShadow:n<=intensity?`0 0 5px ${heat(intensity,0.6)}`:'none',
+                  animation:`pip-in 0.35s ease-out ${n*0.06}s both`}}/>;
+              })}
+              <span style={{fontFamily:'var(--font-mono)',fontSize:12,color:'#a8a39a',marginLeft:10}}>
+                {getI(cellB,cellC)}/5
+              </span>
+            </div>
+          </div>
+          <div style={S.mSection}>
+            <div style={S.mLabel}>What this looks like in practice here</div>
+            <p style={S.mProse}>{cellB.contexts[cellC.id].note}</p>
+          </div>
+          <div style={S.mSection}>
+            <div style={S.mLabel}>What the challenge is</div>
+            <p style={S.mSub}>{cellB.definition}</p>
+          </div>
+          <button style={S.mCta} onClick={()=>{ setSelectedB(cellB.id); setSelectedCell(null); }}
+            onMouseEnter={e=>{ e.currentTarget.style.background='rgba(245,201,118,0.1)'; }}
+            onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; }}>
+            Read the full story on this challenge →
+          </button>
+        </Modal>
+      )}
+
+      {/* BOTTLENECK MODAL */}
+      {selectedB && bData && (
+        <Modal onClose={()=>setSelectedB(null)}>
+          <div style={S.mKicker}>Challenge {bData.num}</div>
+          <h2 style={S.mTitle}>{bData.name}</h2>
+          <p style={S.mLede}>{bData.short}</p>
+
+          <div style={S.mSection}>
+            <div style={S.mLabel}>What it is</div>
+            <p style={S.mProse}>{bData.definition}</p>
+          </div>
+          <div style={S.mSection}>
+            <div style={S.mLabel}>Where things stand today</div>
+            <p style={S.mProse}>{bData.sota}</p>
+          </div>
+          <div style={S.mSection}>
+            <div style={S.mLabel}>How people are trying to solve it</div>
+            <div style={S.aHint}>Each approach attacks the problem from a different angle — tag tells you which.</div>
+            <div style={S.approachList}>
+              {bData.approaches.map((a,i)=>{
+                const ang = ANGLES[a.angle]||ANGLES.design;
+                return (
+                  <div key={i} style={{...S.approachItem,borderLeftColor:ang.color,
+                    animation:`slide-in-left 0.4s ease-out ${i*0.07}s both`}}>
+                    <div style={S.aHead}>
+                      <div style={{...S.aPill,color:ang.color,borderColor:ang.color,
+                        boxShadow:`0 0 5px ${ang.color}40`}} title={ang.desc}>{ang.label}</div>
+                      <div style={S.aName}>{a.name}</div>
+                    </div>
+                    <div style={S.aMeta}><span style={S.aLabel}>Who's doing it: </span>{a.players}</div>
+                    <div style={S.aMeta}><span style={S.aLabel}>The bet: </span>{a.bet}</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={S.legend}>
+              {Object.entries(ANGLES).filter(([k])=>bData.approaches.some(a=>a.angle===k)).map(([k,ang])=>(
+                <div key={k} style={S.legendItem}>
+                  <div style={{width:8,height:8,marginTop:4,background:ang.color,boxShadow:`0 0 5px ${ang.color}80`}}/>
+                  <div>
+                    <div style={{...S.legendLabel,color:ang.color}}>{ang.label}</div>
+                    <div style={S.legendDesc}>{ang.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={S.mSection}>
+            <div style={S.mLabel}>Smaller pieces of the problem</div>
+            <div style={S.subnodeGrid}>
+              {bData.subnodes.map((s,i)=><div key={i} style={S.subnode}>{s}</div>)}
+            </div>
+          </div>
+          <div style={S.mSection}>
+            <div style={S.mLabel}>How it shows up in different settings</div>
+            <div style={S.ctxList}>
+              {CONTEXTS.map(c=>{
+                const intensity = bData.contexts[c.id].intensity;
+                return (
+                  <div key={c.id} style={S.ctxItem}>
+                    <div style={S.ctxHeader}>
+                      <div style={S.ctxName}>{c.name}</div>
+                      <div style={{display:'flex',alignItems:'center',gap:6}}>
+                        <div style={S.ctxBar}>
+                          <div style={{...S.ctxFill,width:`${intensity*20}%`,
+                            background:heat(intensity,1),boxShadow:`0 0 5px ${heat(intensity,0.5)}`}}/>
+                        </div>
+                        <span style={{fontFamily:'var(--font-mono)',fontSize:10,color:'#7a7460'}}>{intensity}</span>
+                      </div>
+                    </div>
+                    <div style={S.ctxNote}>{bData.contexts[c.id].note}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div style={S.mSection}>
+            <div style={S.mLabel}>Want to read more?</div>
+            <div style={S.refList}>
+              {bData.refs.map((r,i)=>(
+                <a key={i} href={r.url} target="_blank" rel="noreferrer" style={S.refLink}
+                  onMouseEnter={e=>{ e.currentTarget.style.color='#fff'; }}
+                  onMouseLeave={e=>{ e.currentTarget.style.color='#f5c976'; }}>
+                  → {r.title}
+                </a>
+              ))}
+            </div>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body>
+</html>
