@@ -432,6 +432,7 @@
     /* ── Responsive ── */
     @media (max-width: 768px) {
       .nav { padding: 12px 20px; }
+      .nav-logo { font-size: 14px; gap: 8px; }
       .hero { padding: 100px 20px 60px; }
       .section { padding: 0 20px 60px; }
       .section-divider { margin: 0 20px 60px; }
@@ -864,7 +865,7 @@ function ParallaxLattice({mx,my}) {
 }
 
 // ── MODAL ────────────────────────────────────────────────────
-function Modal({children,onClose}) {
+function Modal({children,onClose,isMobile}) {
   useEffect(()=>{
     const handler = e => { if(e.key==='Escape') onClose(); };
     document.addEventListener('keydown',handler);
@@ -891,7 +892,7 @@ function Modal({children,onClose}) {
             <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" strokeWidth="1.5"/>
           </svg>
         </button>
-        <div style={{padding:'40px 40px'}}>{children}</div>
+        <div style={{padding:isMobile?'24px 20px':'40px 40px'}}>{children}</div>
       </div>
     </div>
   );
@@ -913,7 +914,14 @@ function App() {
   const [mx, setMx] = useState(0);
   const [my, setMy] = useState(0);
   const [tick, setTick] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const mapRef = useRef(null);
+
+  useEffect(()=>{
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  },[]);
 
   const activeLens = LENSES.find(l=>l.id===lens);
 
@@ -955,15 +963,15 @@ function App() {
   const bData = selectedB ? BOTTLENECKS.find(b=>b.id===selectedB) : null;
 
   const S = {
-    wrap:{maxWidth:1280,margin:'0 auto',padding:'0 40px 80px',position:'relative',zIndex:1},
-    lensRow:{display:'grid',gridTemplateColumns:'200px 1fr',gap:32,alignItems:'flex-start',marginBottom:56},
+    wrap:{maxWidth:1280,margin:'0 auto',padding:isMobile?'0 16px 80px':'0 40px 80px',position:'relative',zIndex:1},
+    lensRow:{display:'grid',gridTemplateColumns:isMobile?'1fr':'200px 1fr',gap:isMobile?20:32,alignItems:'flex-start',marginBottom:56},
     lensGrid:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:8},
     lensBtn:{padding:'12px 14px',background:'rgba(18,16,36,0.6)',border:'1px solid rgba(245,201,118,0.1)',
       transition:'all .2s',backdropFilter:'blur(4px)',cursor:'pointer'},
     lensBtnA:{background:'rgba(245,201,118,0.08)',border:'1px solid rgba(245,201,118,0.5)',
       boxShadow:'0 0 20px rgba(245,201,118,0.18),inset 0 0 10px rgba(245,201,118,0.05)'},
-    mapGridWrap:{position:'relative'},
-    grid:{display:'grid',gridTemplateColumns:'minmax(200px,260px) repeat(5,1fr)',gap:5,position:'relative',zIndex:2},
+    mapGridWrap:{position:'relative',overflowX:isMobile?'auto':'visible',WebkitOverflowScrolling:'touch'},
+    grid:{display:'grid',gridTemplateColumns:'minmax(200px,260px) repeat(5,1fr)',gap:5,position:'relative',zIndex:2,minWidth:isMobile?700:'auto'},
     ctxHead:{padding:'10px 6px',borderBottom:'1px solid rgba(245,201,118,0.1)'},
     bRow:{padding:'12px 10px 12px 0',display:'grid',gridTemplateColumns:'30px 1fr 16px',
       alignItems:'center',gap:6,borderRight:'1px solid rgba(245,201,118,0.08)',
@@ -1144,7 +1152,7 @@ function App() {
 
       {/* CELL MODAL */}
       {selectedCell && cellB && cellC && (
-        <Modal onClose={()=>setSelectedCell(null)}>
+        <Modal onClose={()=>setSelectedCell(null)} isMobile={isMobile}>
           <div style={S.mKicker}>Challenge {cellB.num} × {cellC.name}</div>
           <h2 style={S.mTitle}>{cellB.name} in {cellC.name}</h2>
           <div>
@@ -1180,7 +1188,7 @@ function App() {
 
       {/* BOTTLENECK MODAL */}
       {selectedB && bData && (
-        <Modal onClose={()=>setSelectedB(null)}>
+        <Modal onClose={()=>setSelectedB(null)} isMobile={isMobile}>
           <div style={S.mKicker}>Challenge {bData.num}</div>
           <h2 style={S.mTitle}>{bData.name}</h2>
           <p style={S.mLede}>{bData.short}</p>
