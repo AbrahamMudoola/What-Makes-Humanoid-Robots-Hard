@@ -30,7 +30,6 @@ PRs and issues welcome. A few things that would be useful:
 - Accessibility improvements
 - Mobile layout fixes
 
-Keep it to a single `index.html` — no build tooling by design.
 
 ## License
 
