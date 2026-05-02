@@ -1,6 +1,6 @@
 # What Makes Humanoid Robots Hard?
 
-An interactive field guide to the 8 technical challenges standing between humanoid robots and widespread deployment — synthesized from major research reports and real-world pilots at BMW, Amazon, Mercedes, and more.
+An interactive field guide to the 8 technical challenges standing between humanoid robots and widespread deployment — synthesized from major research reports and real-world pilots.
 
 **[Live site →](https://abrahammudoola.github.io/What-Makes-Humanoid-Robots-Hard)**
 
@@ -9,7 +9,7 @@ An interactive field guide to the 8 technical challenges standing between humano
 - 8 core challenges mapped across 5 deployment contexts (factory, warehouse, healthcare, home, construction)
 - 6 solution angles with 34 approaches mapped
 - Data drawn from McKinsey, Bain, BCG, Goldman Sachs, Morgan Stanley, ARK Invest, and IFR
-- Pilot data from BMW + Figure, Amazon + Agility, Mercedes + Apptronik, and others
+- Pilot data from real-world industrial deployments
 
 ## Running locally
 
